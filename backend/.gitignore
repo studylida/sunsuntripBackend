@@ -1,0 +1,48 @@
+# === Build output ===
+/target/
+/build/
+
+# === Maven Wrapper ===
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === IntelliJ IDEA ===
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# === Logs and temp files ===
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# === Secret and Config Files ===
+.env
+.env.*
+
+# === AWS & Certificates ===
+*.pem
+*.key
+*.crt
+*.p12
+.aws/
+**/credentials
+**/secrets
+
+# === Docker (for local overrides and container artifacts) ===
+docker-compose.override.yml
+docker-compose.local.yml
+*.pid
+*.pid.lock
+
+# === IntelliJ-related cache (optional) ===
+.apt_generated
+.springBeans/
+.sts4-cache/
