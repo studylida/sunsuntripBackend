@@ -15,17 +15,17 @@ public class RoutePlace {
     @ManyToOne(optional = false)
     private Place place;
 
-    private int day;
+    private int visitDay;
     private int stayMinutes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private RouteResult routeResult;
 
-    protected RoutePlace() {}
+    public RoutePlace() {}
 
-    public RoutePlace(Place place, int day, int stayMinutes) {
+    public RoutePlace(Place place, int visitDay, int stayMinutes) {
         this.place = place;
-        this.day = day;
+        this.visitDay = visitDay;
         this.stayMinutes = stayMinutes;
     }
 
@@ -51,12 +51,12 @@ public class RoutePlace {
         this.place = place;
     }
 
-    public int getDay() {
-        return day;
+    public int getVisitDay() {
+        return visitDay;
     }
 
-    public void setDay(int day) {
-        this.day = day;
+    public void setVisitDay(int visitDay) {
+        this.visitDay = visitDay;
     }
 
     public int getStayMinutes() {

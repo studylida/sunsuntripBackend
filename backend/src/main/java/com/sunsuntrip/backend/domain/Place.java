@@ -39,7 +39,7 @@ public class Place {
     private List<Theme> themes = new ArrayList<>();
 
     // 기본 생성자 (꼭 필요!)
-    protected Place() {
+    public Place() {
     }
 
     public Place(Long id, String name, String description, PlaceCategory category, double latitude, double longitude) {
@@ -81,5 +81,29 @@ public class Place {
 
     public void setThemes(List<Theme> themes) {
         this.themes = themes;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCategory(PlaceCategory category) {
+        this.category = category;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }
