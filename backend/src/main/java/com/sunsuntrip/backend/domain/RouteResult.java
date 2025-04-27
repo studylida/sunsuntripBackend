@@ -25,7 +25,7 @@ public class RouteResult {
     @OneToMany(mappedBy = "routeResult", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoutePlace> routePlaces = new ArrayList<>();
 
-    protected RouteResult() {}
+    public RouteResult() {}
 
     public RouteResult(double totalDistance, int totalDuration, UserCondition userCondition) {
         this.totalDistance = totalDistance;

@@ -32,4 +32,84 @@ public class UserCondition {
             inverseJoinColumns = @JoinColumn(name = "theme_id")
     )
     private List<Theme> themes = new ArrayList<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
+    }
+
+    public int getBudget() {
+        return budget;
+    }
+
+    public void setBudget(int budget) {
+        this.budget = budget;
+    }
+
+    public int getNumberOfPeople() {
+        return numberOfPeople;
+    }
+
+    public void setNumberOfPeople(int numberOfPeople) {
+        this.numberOfPeople = numberOfPeople;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public boolean isAvoidCrowd() {
+        return avoidCrowd;
+    }
+
+    public void setAvoidCrowd(boolean avoidCrowd) {
+        this.avoidCrowd = avoidCrowd;
+    }
+
+    public boolean isPreferOnsen() {
+        return preferOnsen;
+    }
+
+    public void setPreferOnsen(boolean preferOnsen) {
+        this.preferOnsen = preferOnsen;
+    }
+
+    public boolean isUsePublicTransportOnly() {
+        return usePublicTransportOnly;
+    }
+
+    public void setUsePublicTransportOnly(boolean usePublicTransportOnly) {
+        this.usePublicTransportOnly = usePublicTransportOnly;
+    }
+
+    public boolean isMobilityLimitations() {
+        return mobilityLimitations;
+    }
+
+    public void setMobilityLimitations(boolean mobilityLimitations) {
+        this.mobilityLimitations = mobilityLimitations;
+    }
+
+    public List<Theme> getThemes() {
+        return themes;
+    }
+
+    public void setThemes(List<Theme> themes) {
+        this.themes = themes;
+    }
 }
