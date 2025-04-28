@@ -1,9 +1,6 @@
 package com.sunsuntrip.backend.service;
 
-import com.sunsuntrip.backend.domain.Place;
-import com.sunsuntrip.backend.domain.RouteResult;
-import com.sunsuntrip.backend.domain.RoutePlace;
-import com.sunsuntrip.backend.domain.UserCondition;
+import com.sunsuntrip.backend.domain.*;
 import com.sunsuntrip.backend.domain.Place.PlaceCategory;
 
 import java.util.*;
@@ -36,14 +33,58 @@ public class RouteAlgorithmService {
 
     // === 1. 사용자 조건에 맞는 장소 필터링 ===
     private List<Place> filterPlacesByUserCondition(List<Place> places, UserCondition userCondition) {
+        System.out.println("=== start ===");
+
+        // 🔵 1. 사용자 조건 (UserCondition) 출력
+        System.out.println("--- [사용자 조건] ---");
+        System.out.println("여행일수: " + userCondition.getDays());
+        System.out.println("예산: " + userCondition.getBudget());
+        System.out.println("출발일: " + userCondition.getStartDate());
+        System.out.println("군중 회피 여부: " + userCondition.isAvoidCrowd());
+        System.out.println("이동 제한 여부: " + userCondition.isMobilityLimitations());
+        System.out.println("온천 선호 여부: " + userCondition.isPreferOnsen());
+        System.out.println("대중교통만 이용 여부: " + userCondition.isUsePublicTransportOnly());
+        System.out.println("여행 인원 수: " + userCondition.getNumberOfPeople());
+
+        System.out.print("선호 테마: ");
+        if (userCondition.getThemes() != null && !userCondition.getThemes().isEmpty()) {
+            for (Theme theme : userCondition.getThemes()) {
+                System.out.print(theme.getName() + " ");
+            }
+            System.out.println(); // 줄바꿈
+        } else {
+            System.out.println("없음");
+        }
+
+        // 🔵 2. 전체 장소 리스트 출력
+        System.out.println("\n--- [장소 리스트] ---");
+        for (Place place : places) {
+            System.out.println("장소 이름: " + place.getName());
+
+            if (place.getThemes() != null && !place.getThemes().isEmpty()) {
+                System.out.print("테마들: ");
+                for (Theme theme : place.getThemes()) {
+                    System.out.print(theme.getName() + " ");
+                }
+                System.out.println(); // 줄바꿈
+            } else {
+                System.out.println("테마 없음");
+            }
+        }
+
+        // 🔵 3. 실제 필터링 로직
         return places.stream()
-                .filter(place -> {
-                    // 하나라도 매칭되는 테마가 있으면 true
-                    return userCondition.getThemes().stream()
-                            .anyMatch(theme -> place.getThemes().contains(theme));
-                })
+                .filter(place ->
+                        userCondition.getThemes().stream()
+                                .anyMatch(userTheme ->
+                                        place.getThemes().stream()
+                                                .anyMatch(placeTheme -> placeTheme.getName().equals(userTheme.getName()))
+                                )
+                )
                 .collect(Collectors.toList());
+
     }
+
 
 
     // === 2. 장소 간 거리 행렬 생성 ===
@@ -141,6 +182,7 @@ public class RouteAlgorithmService {
         List<Place> accommodations = new ArrayList<>();
         List<Place> attractions = new ArrayList<>();
         List<Place> foodPlaces = new ArrayList<>();
+        List<Place> shoppingPlaces = new ArrayList<>(); // 🛍️ 쇼핑 추가
 
         for (Place place : places) {
             if (place.getCategory() == PlaceCategory.ACCOMMODATION) {
@@ -149,8 +191,11 @@ public class RouteAlgorithmService {
                 attractions.add(place);
             } else if (place.getCategory() == PlaceCategory.FOOD) {
                 foodPlaces.add(place);
+            } else if (place.getCategory() == PlaceCategory.SHOPPING) { // 쇼핑 추가
+                shoppingPlaces.add(place);
             }
         }
+
 
         // 4-2. 일별로 골고루 배치
         List<List<Place>> dailyPlans = new ArrayList<>();
@@ -164,7 +209,7 @@ public class RouteAlgorithmService {
             }
 
             if (!foodPlaces.isEmpty()) todayPlan.add(foodPlaces.remove(0));
-            if (!foodPlaces.isEmpty() && Math.random() < 0.5) todayPlan.add(foodPlaces.remove(0)); // 50% 확률로 식당 추가
+            if (!shoppingPlaces.isEmpty()) todayPlan.add(shoppingPlaces.remove(0)); // 🛍️ 쇼핑 추가
 
             dailyPlans.add(todayPlan);
         }
@@ -173,12 +218,14 @@ public class RouteAlgorithmService {
         List<Place> remaining = new ArrayList<>();
         remaining.addAll(attractions);
         remaining.addAll(foodPlaces);
+        remaining.addAll(shoppingPlaces); // 🛍️ 쇼핑 추가
 
         int idx = 0;
         for (Place place : remaining) {
             dailyPlans.get(idx % totalDays).add(place);
             idx++;
         }
+
 
         return dailyPlans;
     }
