@@ -57,8 +57,29 @@ public class RouteAlgorithmTestMain implements CommandLineRunner {
             System.out.println("총 이동 거리(km): " + result.getTotalDistance());
             System.out.println("총 소요 시간(분): " + result.getTotalDuration());
 
+            // 🔵 루트 상세 출력
+            System.out.println("--- 생성된 루트 ---");
+            int order = 1;
+            for (var routePlace : result.getRoutePlaces()) {
+                Place place = routePlace.getPlace();
+
+                // 테마 이름들을 콤마로 이어붙이기
+                String themeNames = place.getThemes().stream()
+                        .map(Theme::getName)
+                        .reduce((t1, t2) -> t1 + ", " + t2)
+                        .orElse("테마 없음");
+
+                System.out.println(order++ + ". " + place.getName() +
+                        " (테마: " + themeNames +
+                        ", 체류 시간: " + routePlace.getStayMinutes() +
+                        "분, 방문 일자: " + routePlace.getVisitDay() + "일차)");
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }
