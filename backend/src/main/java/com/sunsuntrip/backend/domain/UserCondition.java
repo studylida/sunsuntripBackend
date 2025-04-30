@@ -20,11 +20,6 @@ public class UserCondition {
     private int numberOfPeople;
     private LocalDate startDate;
 
-    private boolean avoidCrowd;
-    private boolean preferOnsen;
-    private boolean usePublicTransportOnly;
-    private boolean mobilityLimitations;
-
     @ManyToMany
     @JoinTable(
             name = "usercondition_theme",
@@ -71,38 +66,6 @@ public class UserCondition {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
-    }
-
-    public boolean isAvoidCrowd() {
-        return avoidCrowd;
-    }
-
-    public void setAvoidCrowd(boolean avoidCrowd) {
-        this.avoidCrowd = avoidCrowd;
-    }
-
-    public boolean isPreferOnsen() {
-        return preferOnsen;
-    }
-
-    public void setPreferOnsen(boolean preferOnsen) {
-        this.preferOnsen = preferOnsen;
-    }
-
-    public boolean isUsePublicTransportOnly() {
-        return usePublicTransportOnly;
-    }
-
-    public void setUsePublicTransportOnly(boolean usePublicTransportOnly) {
-        this.usePublicTransportOnly = usePublicTransportOnly;
-    }
-
-    public boolean isMobilityLimitations() {
-        return mobilityLimitations;
-    }
-
-    public void setMobilityLimitations(boolean mobilityLimitations) {
-        this.mobilityLimitations = mobilityLimitations;
     }
 
     public List<Theme> getThemes() {
