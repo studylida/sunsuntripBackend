@@ -1,12 +1,9 @@
 package com.sunsuntrip.backend;
 
-import com.sunsuntrip.backend.domain.Place;
-import com.sunsuntrip.backend.domain.RouteResult;
-import com.sunsuntrip.backend.domain.Theme;
-import com.sunsuntrip.backend.domain.UserCondition;
+import com.sunsuntrip.backend.domain.*;
 import com.sunsuntrip.backend.repository.PlaceRepository;
 import com.sunsuntrip.backend.repository.ThemeRepository;
-import com.sunsuntrip.backend.service.RouteAlgorithmService;
+import com.sunsuntrip.backend.service.RouteAlgorithmService2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,55 +28,52 @@ public class RouteAlgorithmTestMain implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
-            RouteAlgorithmService service = new RouteAlgorithmService();
+            RouteAlgorithmService2 service = new RouteAlgorithmService2();
 
-            // 🔵 Theme와 Place를 DB에서 조회
+            // 🔵 1. DB에서 Theme 및 Place 조회
             List<Theme> allThemes = themeRepository.findAll();
             List<Place> allPlaces = placeRepository.findAllWithThemes();
 
-            // 🔵 UserCondition 직접 생성
+            // 🔵 2. 사용자 조건 생성
             UserCondition userCondition = new UserCondition();
-            userCondition.setDays(3);
-            userCondition.setBudget(100000); // 예산
+            userCondition.setDays(2);
+            userCondition.setBudget(100000);
             userCondition.setStartDate(LocalDate.now());
-            userCondition.setAvoidCrowd(false);
-            userCondition.setMobilityLimitations(false);
-            userCondition.setPreferOnsen(false);
-            userCondition.setUsePublicTransportOnly(false);
             userCondition.setNumberOfPeople(2);
-            userCondition.setThemes(allThemes); // 모든 테마 선호한다고 가정
+            userCondition.setThemes(allThemes); // 모든 테마를 선호한다고 가정
 
-            // 🔵 루트 생성
+            // 🔵 3. 경로 생성
             RouteResult result = service.generateRoute(userCondition, allPlaces);
 
-            // 🔵 결과 출력
-            System.out.println("총 장소 수: " + result.getRoutePlaces().size());
-            System.out.println("총 이동 거리(km): " + result.getTotalDistance());
-            System.out.println("총 소요 시간(분): " + result.getTotalDuration());
-
-            // 🔵 루트 상세 출력
-            System.out.println("--- 생성된 루트 ---");
-            int order = 1;
-            for (var routePlace : result.getRoutePlaces()) {
-                Place place = routePlace.getPlace();
-
-                // 테마 이름들을 콤마로 이어붙이기
-                String themeNames = place.getThemes().stream()
-                        .map(Theme::getName)
-                        .reduce((t1, t2) -> t1 + ", " + t2)
-                        .orElse("테마 없음");
-
-                System.out.println(order++ + ". " + place.getName() +
-                        " (테마: " + themeNames +
-                        ", 체류 시간: " + routePlace.getStayMinutes() +
-                        "분, 방문 일자: " + routePlace.getVisitDay() + "일차)");
-            }
-
+            // 🔵 4. 결과 출력
+            printRouteSummary(result);
+            printDailyPlans(result);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void printRouteSummary(RouteResult result) {
+        System.out.println("✅ [요약 정보]");
+        System.out.println("총 장소 수: " + result.getRoutePlaces().size());
+        System.out.printf("총 이동 거리: %.2f km\n", result.getTotalDistance());
+        System.out.println("총 소요 시간: " + result.getTotalDuration() + "분");
+    }
 
+    private void printDailyPlans(RouteResult result) {
+        System.out.println("\n📅 [일자별 일정]");
+        int currentDay = -1;
+        for (RoutePlace rp : result.getRoutePlaces()) {
+            if (rp.getVisitDay() != currentDay) {
+                currentDay = rp.getVisitDay();
+                System.out.printf("Day %d\n", currentDay);
+            }
+            System.out.printf("  - %-15s (%-12s) [%d분]\n",
+                    rp.getPlace().getName(),
+                    rp.getPlace().getCategory(),
+                    rp.getStayMinutes()
+            );
+        }
+    }
 }
