@@ -1,16 +1,23 @@
 package com.sunsuntrip.backend;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
-@PropertySource("classpath:/application.properties") // 기본 설정
-@PropertySource(value = "file:.env", ignoreResourceNotFound = true) // .env 파일 로드
 public class SunsuntripBackendApplication {
 
 	public static void main(String[] args) {
+		// ✅ .env 로드 후 System Property에 등록
+		Dotenv dotenv = Dotenv.configure()
+				.filename(".env")
+				.ignoreIfMissing()
+				.load();
+
+		dotenv.entries().forEach(entry ->
+				System.setProperty(entry.getKey(), entry.getValue())
+		);
+
 		SpringApplication.run(SunsuntripBackendApplication.class, args);
 	}
-
 }

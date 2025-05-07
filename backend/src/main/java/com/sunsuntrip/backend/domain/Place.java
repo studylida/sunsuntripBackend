@@ -1,6 +1,8 @@
 package com.sunsuntrip.backend.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,19 +40,25 @@ public class Place {
     )
     private List<Theme> themes = new ArrayList<>();
 
-    // 기본 생성자 (꼭 필요!)
+    // 기본 생성자 (JPA를 위해 꼭 필요)
     public Place() {
     }
 
-    public Place(Long id, String name, String description, PlaceCategory category, double latitude, double longitude) {
+    // 📌 @Builder를 여기에 적용
+    @Builder
+    public Place(Long id, String name, String description,
+                 PlaceCategory category, double latitude, double longitude,
+                 List<Theme> themes) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.themes = themes != null ? themes : new ArrayList<>();
     }
 
+    // getter, setter 생략 없이 그대로 유지
     public Long getId() {
         return id;
     }

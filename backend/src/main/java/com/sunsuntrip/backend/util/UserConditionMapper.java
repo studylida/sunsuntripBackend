@@ -1,4 +1,4 @@
-package com.sunsuntrip.backend.service;
+package com.sunsuntrip.backend.util;
 
 import com.sunsuntrip.backend.domain.Theme;
 import com.sunsuntrip.backend.domain.UserCondition;

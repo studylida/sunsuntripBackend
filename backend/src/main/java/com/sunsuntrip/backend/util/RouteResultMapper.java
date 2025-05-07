@@ -1,11 +1,10 @@
-package com.sunsuntrip.backend.service;
+package com.sunsuntrip.backend.util;
 
 import com.sunsuntrip.backend.domain.Place;
 import com.sunsuntrip.backend.domain.RoutePlace;
 import com.sunsuntrip.backend.domain.RouteResult;
 import com.sunsuntrip.backend.domain.Theme;
 import com.sunsuntrip.backend.dto.DailyPlanDTO;
-import com.sunsuntrip.backend.dto.PlaceResponseDTO;
 import com.sunsuntrip.backend.dto.RoutePlaceDTO;
 import com.sunsuntrip.backend.dto.RouteResultResponseDTO;
 import org.springframework.stereotype.Service;

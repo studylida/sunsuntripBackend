@@ -52,23 +52,24 @@ public class RouteAlgorithmService2 {
     ) {
         List<Place> result = new ArrayList<>();
 
-        // 1. 아침 식당
+        // 선택 시 null 방지 확인
         Place breakfast = selectNearest(prevAccommodation, foods);
+        if (breakfast == null) throw new IllegalStateException("아침 식당 장소가 부족합니다.");
         result.add(breakfast);
         foods.remove(breakfast);
 
-        // 2. 쇼핑/관광지 A
         Place spotA = selectNearest(breakfast, coreSpots);
+        if (spotA == null) throw new IllegalStateException("관광지/쇼핑 장소가 부족합니다.");
         result.add(spotA);
         coreSpots.remove(spotA);
 
-        // 3. 점심 식당
         Place lunch = selectNearest(spotA, foods);
+        if (lunch == null) throw new IllegalStateException("점심 식당 장소가 부족합니다.");
         result.add(lunch);
         foods.remove(lunch);
 
-        // 4. 쇼핑/관광지 B, C (서로 가까운 2곳)
         List<Place> next2 = selectNearestN(lunch, coreSpots, 5);
+        if (next2.size() < 2) throw new IllegalStateException("오후 관광지 후보가 부족합니다.");
         Place[] pair = findClosestPair(next2);
         result.add(pair[0]);
         result.add(pair[1]);
@@ -76,18 +77,18 @@ public class RouteAlgorithmService2 {
         coreSpots.remove(pair[1]);
 
         if (!isLastDay) {
-            // 5. 저녁 식당
             Place dinner = selectNearest(pair[1], foods);
+            if (dinner == null) throw new IllegalStateException("저녁 식당 장소가 부족합니다.");
             result.add(dinner);
             foods.remove(dinner);
 
-            // 6. 쇼핑/관광지 D
             Place spotD = selectNearest(dinner, coreSpots);
+            if (spotD == null) throw new IllegalStateException("저녁 이후 관광 장소가 부족합니다.");
             result.add(spotD);
             coreSpots.remove(spotD);
 
-            // 7. 숙소
             Place accommodation = selectNearest(spotD, accommodations);
+            if (accommodation == null) throw new IllegalStateException("숙소 장소가 부족합니다.");
             result.add(accommodation);
             accommodations.remove(accommodation);
         }
@@ -114,11 +115,15 @@ public class RouteAlgorithmService2 {
 
     // === 선택 로직 ===
     private Place selectNearest(Place from, List<Place> options) {
-        if (from == null) return options.get(new Random().nextInt(Math.min(3, options.size())));
+        if (options == null || options.isEmpty()) return null;
+
+        if (from == null) {
+            return options.get(new Random().nextInt(Math.min(3, options.size())));
+        }
 
         return options.stream()
                 .min(Comparator.comparingDouble(p -> haversineDistance(from, p)))
-                .orElseThrow();
+                .orElse(null); // ✅ null 반환
     }
 
     private List<Place> selectNearestN(Place from, List<Place> options, int n) {

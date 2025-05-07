@@ -12,4 +12,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @Query("SELECT p FROM Place p LEFT JOIN FETCH p.themes")
     List<Place> findAllWithThemes();
+
+    boolean existsByNameAndLatitudeAndLongitude(String name, double latitude, double longitude);
 }

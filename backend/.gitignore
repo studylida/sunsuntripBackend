@@ -24,6 +24,7 @@ Thumbs.db
 *.swo
 
 # === Secret and Config Files ===
+.properties
 .env
 .env.*
 
