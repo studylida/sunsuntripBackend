@@ -24,7 +24,7 @@ Thumbs.db
 *.swo
 
 # === Secret and Config Files ===
-.properties
+backend/src/main/resources/application.properties
 .env
 .env.*
 
