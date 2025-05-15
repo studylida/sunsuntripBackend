@@ -16,9 +16,18 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")  // ✅ H2 콘솔은 CSRF 검사 제외
+                        .disable()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable())      // ✅ iframe 허용 (H2 콘솔용)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()  // ✅ H2 콘솔 허용
+                        .anyRequest().permitAll()
+                )
+                .cors(Customizer.withDefaults());
 
         return http.build();
     }
@@ -37,3 +46,4 @@ public class WebSecurityConfig {
         };
     }
 }
+

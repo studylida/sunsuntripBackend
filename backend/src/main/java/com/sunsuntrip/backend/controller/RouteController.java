@@ -1,6 +1,7 @@
 package com.sunsuntrip.backend.controller;
 
 import com.sunsuntrip.backend.client.GoogleMapsClient;
+import com.sunsuntrip.backend.util.ThemeMinimumPlaceConfig;
 import com.sunsuntrip.backend.domain.Place;
 import com.sunsuntrip.backend.domain.RouteResult;
 import com.sunsuntrip.backend.domain.Theme;
@@ -13,13 +14,13 @@ import com.sunsuntrip.backend.util.UserConditionMapper;
 import com.sunsuntrip.backend.repository.PlaceRepository;
 import com.sunsuntrip.backend.repository.ThemeRepository;
 import com.sunsuntrip.backend.service.RouteAlgorithmService2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class RouteController {
@@ -65,40 +66,51 @@ public class RouteController {
 //    }
     @PostMapping("/route")
     public ResponseEntity<RouteResultResponseDTO> generateRoute(@RequestBody UserConditionRequestDTO requestDTO) {
-        try {// 1. 사용자 조건 → Entity 변환 (선택한 Theme ID 기준)
-            List<Theme> selectedThemes = themeRepository.findAllById(requestDTO.getThemeIds());
-            UserCondition userCondition = userConditionMapper.toEntity(requestDTO, selectedThemes);
+        // 1. 사용자 조건 → Entity 변환
+        List<Theme> selectedThemes = themeRepository.findAllById(requestDTO.getThemeIds());
+        UserCondition userCondition = userConditionMapper.toEntity(requestDTO, selectedThemes);
 
-            // 2. 현재 DB의 모든 장소 조회 (테마 포함)
-            List<Place> places = placeRepository.findAllWithThemes();
+        // 2. DB에서 모든 장소 조회 (테마 포함)
+        List<Place> allPlaces = placeRepository.findAllWithThemes();
 
-            // 3. 각 테마별로 장소가 부족하면 Google Maps API를 통해 장소 보충
-            for (Theme theme : selectedThemes) {
-                long count = places.stream()
-                        .filter(p -> p.getThemes().stream().anyMatch(t -> t.getName().equals(theme.getName())))
-                        .count();
+        // 3. 테마별 최소 장소 수 기준 보완
+        for (Theme theme : selectedThemes) {
+            int minRequired = ThemeMinimumPlaceConfig.getMinimumCountFor(theme.getName());
 
-                if (count < 15) { // 최소 15개 미만인 경우 보충
-                    String keyword = ThemeKeywordMapper.toSearchKeyword(theme.getName());
-                    List<PlaceDTO> fetchedPlaces = googleMapsClient.searchByKeyword(keyword);
-                    placeService.saveIfNotExist(fetchedPlaces);
+            List<Place> themePlaces = allPlaces.stream()
+                    .filter(p -> p.getThemes().stream().anyMatch(t -> t.getName().equals(theme.getName())))
+                    .toList();
+
+            if (themePlaces.size() < minRequired) {
+                int needed = minRequired - themePlaces.size();
+                log.info("🟡 Theme '{}' 장소 부족 ({}개 부족) → Google 보완 시도", theme.getName(), needed);
+
+                String keyword = ThemeKeywordMapper.toSearchKeyword(theme.getName());
+                List<PlaceDTO> fetched = googleMapsClient.searchByKeyword(keyword);
+                List<PlaceDTO> limited = fetched.stream().limit(needed).toList();
+
+                // 🔧 저장 시 로깅 포함
+                for (PlaceDTO dto : limited) {
+                    var category = dto.getCategory();
+                    log.info("📌 [추가 장소] 이름: {}, 원본 category: {}, 테마: {}", dto.getName(), category, theme.getName());
                 }
+
+                placeService.saveIfNotExistAndConnectTheme(limited, theme);
             }
-
-            // 4. DB에서 다시 장소를 읽어 최신 상태 반영
-            List<Place> allPlaces = placeRepository.findAllWithThemes();
-
-            // 5. 경로 생성
-            RouteResult result = routeAlgorithmService.generateRoute(userCondition, allPlaces);
-
-            // 6. 응답 DTO로 변환
-            RouteResultResponseDTO responseDTO = routeResultMapper.toDTO(result);
-
-            return ResponseEntity.ok(responseDTO);
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+
+        // 4. 최신 장소 다시 조회
+        List<Place> updatedPlaces = placeRepository.findAllWithThemes();
+
+        // 5. 경로 생성
+        RouteResult result = routeAlgorithmService.generateRoute(userCondition, updatedPlaces);
+
+        // 6. 응답 변환
+        RouteResultResponseDTO responseDTO = routeResultMapper.toDTO(result);
+
+        return ResponseEntity.ok(responseDTO);
     }
+
 
 
     /**

@@ -27,6 +27,7 @@ Thumbs.db
 backend/src/main/resources/application.properties
 .env
 .env.*
+*.properties
 
 # === AWS & Certificates ===
 *.pem
