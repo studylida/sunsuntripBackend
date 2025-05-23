@@ -18,9 +18,11 @@ import java.util.stream.Collectors;
 @Service
 public class RouteResultMapper {
 
+    // ✅ 정적 메서드 버전 (routeId 포함)
     public static RouteResultResponseDTO toDto(RouteResult routeResult) {
         RouteResultResponseDTO dto = new RouteResultResponseDTO();
 
+        dto.setRouteId(routeResult.getId()); // 🔹 routeId 설정
         dto.setTotalDistance((int) routeResult.getTotalDistance());
         dto.setTotalDuration(routeResult.getTotalDuration());
 
@@ -50,29 +52,11 @@ public class RouteResultMapper {
         return dto;
     }
 
-    private static RoutePlaceDTO toRoutePlaceDto(RoutePlace routePlace) {
-        Place place = routePlace.getPlace();
-
-        RoutePlaceDTO dto = new RoutePlaceDTO();
-        dto.setId(place.getId());
-        dto.setName(place.getName());
-        dto.setCategory(place.getCategory().toString());
-        dto.setLatitude(place.getLatitude());
-        dto.setLongitude(place.getLongitude());
-        dto.setStayMinutes(routePlace.getStayMinutes());
-
-        if (place.getThemes() != null) {
-            List<String> themeNames = place.getThemes().stream()
-                    .map(Theme::getName)
-                    .collect(Collectors.toList());
-            dto.setThemes(themeNames);
-        }
-
-        return dto;
-    }
-
+    // ✅ 비정적 메서드 버전 (routeId 포함)
     public RouteResultResponseDTO toDTO(RouteResult routeResult) {
         RouteResultResponseDTO dto = new RouteResultResponseDTO();
+
+        dto.setRouteId(routeResult.getId()); // 🔹 routeId 설정
         dto.setTotalDistance((int) routeResult.getTotalDistance());
         dto.setTotalDuration(routeResult.getTotalDuration());
 
@@ -92,7 +76,7 @@ public class RouteResultMapper {
                         place.getName(),
                         place.getCategory().name(), // PlaceCategory → String
                         place.getThemes().stream()
-                                .map(Theme::getName) // Theme 리스트 → 테마 이름 리스트
+                                .map(Theme::getName)
                                 .collect(Collectors.toList()),
                         place.getLatitude(),
                         place.getLongitude(),
@@ -105,6 +89,28 @@ public class RouteResultMapper {
         });
 
         dto.setDailyPlans(dailyPlans);
+        return dto;
+    }
+
+    // ✅ RoutePlace → RoutePlaceDTO 변환
+    private static RoutePlaceDTO toRoutePlaceDto(RoutePlace routePlace) {
+        Place place = routePlace.getPlace();
+
+        RoutePlaceDTO dto = new RoutePlaceDTO();
+        dto.setId(place.getId());
+        dto.setName(place.getName());
+        dto.setCategory(place.getCategory().toString());
+        dto.setLatitude(place.getLatitude());
+        dto.setLongitude(place.getLongitude());
+        dto.setStayMinutes(routePlace.getStayMinutes());
+
+        if (place.getThemes() != null) {
+            List<String> themeNames = place.getThemes().stream()
+                    .map(Theme::getName)
+                    .collect(Collectors.toList());
+            dto.setThemes(themeNames);
+        }
+
         return dto;
     }
 }

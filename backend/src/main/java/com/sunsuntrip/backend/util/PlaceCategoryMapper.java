@@ -19,13 +19,17 @@ public class PlaceCategoryMapper {
     // 예시
     public static Place.PlaceCategory mapFromGoogleType(String type) {
         switch (type.toLowerCase()) {
-            case "tourist_attraction", "museum", "natural_feature", "spa", "bathhouse":
+            case "spa", "museum", "art_gallery", "zoo", "aquarium",
+                 "tourist_attraction", "natural_feature", "amusement_park",
+                 "park", "movie_theater", "night_club", "stadium",
+                 "campground", "synagogue", "church", "hindu_temple":
                 return Place.PlaceCategory.ATTRACTION;
-            case "shopping_mall", "store", "clothing_store":
+            case "shopping_mall", "clothing_store", "store", "department_store",
+                 "shoe_store", "jewelry_store", "convenience_store", "supermarket":
                 return Place.PlaceCategory.SHOPPING;
-            case "restaurant", "cafe", "bakery", "food":
+            case "restaurant", "cafe", "bakery", "meal_takeaway", "meal_delivery", "food":
                 return Place.PlaceCategory.FOOD;
-            case "lodging", "hotel", "guest_house":
+            case "lodging", "hotel", "motel", "guest_house":
                 return Place.PlaceCategory.ACCOMMODATION;
             default:
                 return Place.PlaceCategory.ATTRACTION; // 기본값 fallback

@@ -19,8 +19,8 @@ public class SunsuntripBackendApplication {
 		);
 
 		SpringApplication.run(SunsuntripBackendApplication.class, args);
-
-		// 🔵 2. GoogleMapsClientTestMain 실행
-		GoogleMapsClientTestMain.main(new String[0]);
+//
+//		// 🔵 2. GoogleMapsClientTestMain 실행
+//		GoogleMapsClientTestMain.main(new String[0]);
 	}
 }

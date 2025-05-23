@@ -16,9 +16,9 @@ public class UserCondition {
     private Long id;
 
     private int days;
-    private int budget;
-    private int numberOfPeople;
-    private LocalDate startDate;
+//    private int budget;
+//    private int numberOfPeople;
+//    private LocalDate startDate;
 
     @ManyToMany
     @JoinTable(
@@ -44,29 +44,29 @@ public class UserCondition {
         this.days = days;
     }
 
-    public int getBudget() {
-        return budget;
-    }
-
-    public void setBudget(int budget) {
-        this.budget = budget;
-    }
-
-    public int getNumberOfPeople() {
-        return numberOfPeople;
-    }
-
-    public void setNumberOfPeople(int numberOfPeople) {
-        this.numberOfPeople = numberOfPeople;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
+//    public int getBudget() {
+//        return budget;
+//    }
+//
+//    public void setBudget(int budget) {
+//        this.budget = budget;
+//    }
+//
+//    public int getNumberOfPeople() {
+//        return numberOfPeople;
+//    }
+//
+//    public void setNumberOfPeople(int numberOfPeople) {
+//        this.numberOfPeople = numberOfPeople;
+//    }
+//
+//    public LocalDate getStartDate() {
+//        return startDate;
+//    }
+//
+//    public void setStartDate(LocalDate startDate) {
+//        this.startDate = startDate;
+//    }
 
     public List<Theme> getThemes() {
         return themes;
